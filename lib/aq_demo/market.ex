@@ -18,7 +18,7 @@ defmodule AqDemo.Market do
 
   """
   def list_units do
-    Repo.all(Unit)
+    Repo.all(from u in Unit, order_by: [desc: u.id])
   end
 
   @doc """
@@ -53,6 +53,7 @@ defmodule AqDemo.Market do
     %Unit{}
     |> Unit.changeset(attrs)
     |> Repo.insert()
+    |> broadcast_change(:unit_created)
   end
 
   @doc """
@@ -71,6 +72,7 @@ defmodule AqDemo.Market do
     unit
     |> Unit.changeset(attrs)
     |> Repo.update()
+    |> broadcast_change(:unit_updated)
   end
 
   @doc """
@@ -87,6 +89,7 @@ defmodule AqDemo.Market do
   """
   def delete_unit(%Unit{} = unit) do
     Repo.delete(unit)
+    |> broadcast_change(:unit_deleted)
   end
 
   @doc """
@@ -101,4 +104,15 @@ defmodule AqDemo.Market do
   def change_unit(%Unit{} = unit, attrs \\ %{}) do
     Unit.changeset(unit, attrs)
   end
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(AqDemo.PubSub, "units")
+  end
+
+  defp broadcast_change({:ok, result}, event) do
+    Phoenix.PubSub.broadcast(AqDemo.PubSub, "units", {event, result})
+
+    {:ok, result}
+  end
+
 end
