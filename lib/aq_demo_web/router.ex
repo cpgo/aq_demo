@@ -17,8 +17,8 @@ defmodule AqDemoWeb.Router do
   scope "/", AqDemoWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
-    live "/units", UnitLive.Index, :index
+    resources "/users", UserController
+    live "/", UnitLive.Index, :index
     live "/units/new", UnitLive.Index, :new
     live "/units/:id/edit", UnitLive.Index, :edit
 
