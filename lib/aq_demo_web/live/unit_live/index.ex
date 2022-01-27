@@ -5,16 +5,16 @@ defmodule AqDemoWeb.UnitLive.Index do
   alias AqDemo.Market.Unit
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, _session, socket) do # mount runs when the page loads and the client websocket connects to the channel
     {:ok, assign(socket, :units, list_units())}
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, _url, socket) do # is triggered when the LiveView gets a message
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
+  defp apply_action(socket, :edit, %{"id" => id}) do # apply_action is pattern matched from the handle_params call depending on what params we got
     socket
     |> assign(:page_title, "Edit Unit")
     |> assign(:unit, Market.get_unit!(id))
@@ -33,7 +33,7 @@ defmodule AqDemoWeb.UnitLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
+  def handle_event("delete", %{"id" => id}, socket) do # GenServer handler, we can use this to interact with messages coming phx_click events
     unit = Market.get_unit!(id)
     {:ok, _} = Market.delete_unit(unit)
 
