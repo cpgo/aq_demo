@@ -111,7 +111,7 @@ defmodule AqDemo.Market do
 
   defp broadcast_change({:ok, result}, event) do
     Phoenix.PubSub.broadcast(AqDemo.PubSub, "units", {event, result})
-
+    AqDemoWeb.Endpoint.broadcast("events:*", "trigger", result)
     {:ok, result}
   end
 
